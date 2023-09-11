@@ -1,7 +1,22 @@
 import {Message, MessageCodec} from "../Interfaces/MessageCodec";
 import {Utils} from "./Utils";
 
-export class SimpleMessageCodec implements MessageCodec {
+export class BinaryMessageCodec implements MessageCodec {
+    /**
+     * Encodes the given message into a Uint8Array.
+     * The encoding scheme is as follows:
+     * - First byte: Number of headers
+     * - For each header:
+     *   - 2 bytes: Length of the key
+     *   - Key bytes
+     *   - 2 bytes: Length of the value
+     *   - Value bytes
+     * - 3 bytes: Length of the payload
+     * - Payload bytes
+     *
+     * @param message The message to be encoded.
+     * @returns The encoded message as a Uint8Array.
+     */
     encode(message: Message): Uint8Array {
         if (!message || !message.headers || !message.payload) {
             throw new Error("Invalid message format");
@@ -35,6 +50,13 @@ export class SimpleMessageCodec implements MessageCodec {
         return concatenatedArray;
     }
 
+    /**
+     * Decodes the given Uint8Array into a message.
+     * The decoding process is the reverse of the encoding process.
+     *
+     * @param data The Uint8Array to be decoded.
+     * @returns The decoded message.
+     */
     decode(data: Uint8Array): Message {
         let offset = 0;
 
